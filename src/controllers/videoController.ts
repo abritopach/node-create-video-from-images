@@ -1,8 +1,9 @@
 
+import { paramMissingError } from '@shared/constants';
 import chalk from 'chalk';
 import { Request, Response, Router } from 'express';
 import StatusCodes from 'http-status-codes';
-const { OK, METHOD_FAILURE, INTERNAL_SERVER_ERROR } = StatusCodes;
+const { OK, METHOD_FAILURE, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes;
 import * as path from 'path';
 
 // Videoshow.
@@ -10,7 +11,7 @@ const videoshow = require('videoshow');
 
 const videoOptions = {
     fps: 25,
-    loop: 5, // seconds
+    // loop: 5, // seconds
     transition: true,
     transitionDuration: 1, // seconds
     videoBitrate: 1024,
@@ -36,9 +37,20 @@ export async function testVideo(req: Request, res: Response) {
 
 export async function createVideo(req: Request, res: Response) {
     try {
-        console.log(chalk.green(req.files));
-        const images = req.files;
-        await videoGenerationWithVideoShow(images, res);
+        const images = req.files as any;
+        console.log(req.files);
+        const { imagesDuration } = req.body;
+        console.log(imagesDuration);
+        if (!imagesDuration) {
+            return res.status(BAD_REQUEST).json({
+                error: paramMissingError,
+            });
+        }
+        let durations = JSON.parse(JSON.parse(imagesDuration));
+        console.log(durations);
+        const videoImages = images.map((x: any) => Object.assign(x, durations.find((y: any) => y.imageName == x.originalname)));
+        console.log(videoImages);
+        await videoGenerationWithVideoShow(videoImages, res);
     } catch (err) {
         console.error(chalk.red('[VIDEO CONTROLLER ERROR::createVideo]: ' + err.message));
         return res.status(INTERNAL_SERVER_ERROR).json({
