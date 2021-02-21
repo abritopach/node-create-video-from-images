@@ -4,7 +4,7 @@
 
 <a href="https://www.buymeacoffee.com/h6WVj4HcD" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png" alt="Buy Me A Coffee"></a>
 
-Sample project that shows how to create a video from images.
+Sample project that shows how to create a video from images through an API request.
 
 ## Requirements
 
@@ -16,7 +16,7 @@ If you use a MAC
 brew install ffmpeg
 ```
 
-For other operating systems please consult the official documentation.
+For other operating systems please consult the [official documentation](https://ffmpeg.org/download.html).
 
 ## Development server
 
@@ -24,8 +24,34 @@ Run `npm run start:dev` for a dev server. The server will automatically reload i
 
 ## Testing the creation of a video
 
-To create a video you can use for example POSTMAN to send the following request
+To test video generation you can use the following endpoints defined in the API:
 
+
+```bash
+GET /api/video/test
+```
+
+This endpoint will use the images stored in the /public/images directory.
+
+```bash
+POST /api/video/create
+```
+
+This endpoint expects the list of images and the durations of the images. For this, it is necessary that this information is sent as a multipart/form-data.
+
+For example, if we use POSTMAN to test `/api/video/create` endpoint.
+
+In the Body add a field of type file whose name is images and select the images to send.
+
+Add a second field imagesDuration of type text whose value is a JSON with the duration of the images.
+
+This JSON needs to be stringify to be able to send it in a field of type text.
+
+![Postman](readme_resources/postman.png "Postman")
+
+JSON example
+
+```bash
 [
    {
       "imageName":"1.jpg",
@@ -68,3 +94,4 @@ To create a video you can use for example POSTMAN to send the following request
       "loop":10
    }
 ]
+```
